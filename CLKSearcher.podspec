@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage         = "https://github.com/Clinkle/CLKSearcher"
   s.license          = 'MIT'
   s.author           = { "tsheaff" => "tyler@clinkle.com" }
-  s.source           = { :git => "https://github.com/Clinkle/CLKSearcher.git", :tag => s.version.to_s }
+  s.source           = { :git => "git://github.com/Clinkle/CLKSearcher.git", :tag => s.version.to_s }
 
   s.dependency 'FrameAccessor', '~> 1.3.2'
 
