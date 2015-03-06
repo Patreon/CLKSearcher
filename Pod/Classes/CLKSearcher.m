@@ -90,9 +90,13 @@
                 [self performBackgroundSelectorOnSelf:@selector(injectPreferredResults)
                                            withObject:nil];
             }
+            if (self.searchMode != CLKSearcherModeRemoteOnly && [self allowEmptyLocalSearch]) {
+                [self performBackgroundSelectorOnSelf:@selector(performLocalSearch:)
+                                           withObject:query];
+            }
             if (self.searchMode != CLKSearcherModeLocalOnly && [self allowEmptyRemoteSearch]) {
                 [self performBackgroundSelectorOnSelf:@selector(performRemoteSearch:)
-                                           withObject:_query];
+                                           withObject:query];
             } else {
                 [self performBackgroundSelectorOnSelf:@selector(flushRemoteResults)
                                            withObject:nil];
@@ -143,6 +147,11 @@
 - (BOOL)allowEmptyRemoteSearch
 {
     return NO;
+}
+
+- (BOOL)allowEmptyLocalSearch
+{
+    return YES;
 }
 
 - (BOOL)injectsPreferredResultsWhenEmpty
