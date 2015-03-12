@@ -22,6 +22,7 @@
 @property (atomic, strong) NSMutableArray *reportedResults;
 
 @property (nonatomic, readonly) BOOL injectsPreferredResultsWhenEmpty;
+@property (nonatomic, readonly) BOOL injectsPreferredResultsAlways;
 @property (nonatomic, readonly) NSArray *preferredResults;
 
 @property (nonatomic, assign) NSTimeInterval latestLocalRecomputeRequest;
@@ -84,34 +85,43 @@
     }
 
     _query = [query copy];
-    if (_query.length == 0) {
+    [self updateResultsForLatestQuery];
+}
+
+- (void)updateResultsForLatestQuery
+{
+    if (self.query.length == 0) {
         if (!self.isBeingDeallocated) {
-            if (self.injectsPreferredResultsWhenEmpty) {
-                [self performBackgroundSelectorOnSelf:@selector(injectPreferredResults)
-                                           withObject:nil];
+            if (self.injectsPreferredResultsWhenEmpty || self.injectsPreferredResultsAlways) {
+                [self performSelectorInBackground:@selector(injectPreferredResults)
+                                       withObject:nil];
+            }
+            if (self.searchMode != CLKSearcherModeRemoteOnly && [self allowEmptyLocalSearch]) {
+                [self performSelectorInBackground:@selector(performLocalSearch:)
+                                       withObject:self.query];
             }
             if (self.searchMode != CLKSearcherModeLocalOnly && [self allowEmptyRemoteSearch]) {
-                [self performBackgroundSelectorOnSelf:@selector(performRemoteSearch:)
-                                           withObject:_query];
+                [self performSelectorInBackground:@selector(performRemoteSearch:)
+                                       withObject:self.query];
             } else {
-                [self performBackgroundSelectorOnSelf:@selector(flushRemoteResults)
-                                           withObject:nil];
+                [self performSelectorInBackground:@selector(flushRemoteResults)
+                                       withObject:nil];
             }
         }
         return;
     }
 
-    if (self.injectsPreferredResultsWhenEmpty) {
-        [self performBackgroundSelectorOnSelf:@selector(flushPreferredResults)
-                                   withObject:nil];
+    if (self.injectsPreferredResultsWhenEmpty && !self.injectsPreferredResultsAlways) {
+        [self performSelectorInBackground:@selector(flushPreferredResults)
+                               withObject:nil];
     }
     if (self.searchMode != CLKSearcherModeRemoteOnly) {
-        [self performBackgroundSelectorOnSelf:@selector(performLocalSearch:)
-                                   withObject:query];
+        [self performSelectorInBackground:@selector(performLocalSearch:)
+                               withObject:self.query];
     }
     if (self.searchMode != CLKSearcherModeLocalOnly) {
-        [self performBackgroundSelectorOnSelf:@selector(performRemoteSearch:)
-                                   withObject:query];
+        [self performSelectorInBackground:@selector(performRemoteSearch:)
+                               withObject:self.query];
     }
 }
 
@@ -120,24 +130,25 @@
     _query = nil;
 }
 
-- (void)performBackgroundSelectorOnSelf:(SEL)selector
-                             withObject:(id)object
-{
-    [self performSelectorInBackground:selector
-                           withObject:object];
-}
-
 #pragma mark - preferred results
 - (void)injectPreferredResults
 {
-    [self recomputeResultsWithLocalResults:self.preferredResults
+    [self recomputeResultsWithLocalResults:[self localResultsWithPreferredResults:self.preferredResults]
                                atTimestamp:CACurrentMediaTime()];
 }
 
 - (void)flushPreferredResults
 {
-    [self recomputeResultsWithLocalResults:@[]
+    [self recomputeResultsWithLocalResults:[self localResultsWithPreferredResults:@[]]
                                atTimestamp:CACurrentMediaTime()];
+}
+
+- (NSArray *)localResultsWithPreferredResults:(NSArray *)preferredResults
+{
+    if (self.injectsPreferredResultsAlways) {
+        return [preferredResults arrayByAddingObjectsFromArray:self.localResults];
+    }
+    return preferredResults;
 }
 
 - (BOOL)allowEmptyRemoteSearch
@@ -145,7 +156,17 @@
     return NO;
 }
 
+- (BOOL)allowEmptyLocalSearch
+{
+    return YES;
+}
+
 - (BOOL)injectsPreferredResultsWhenEmpty
+{
+    return NO;
+}
+
+- (BOOL)injectsPreferredResultsAlways
 {
     return NO;
 }
@@ -291,6 +312,7 @@
 
     [self mergeRemoteIntoLocalWithoutDuplication];
     [self sortMergedResults];
+    [self dedupeMergedResults];
 
     [self didChangeValueForKey:@"results"];
     [self.reportedResultsLock unlock];
@@ -322,6 +344,11 @@
 }
 
 - (void)sortMergedResults
+{
+    // Override in subclass
+}
+
+- (void)dedupeMergedResults
 {
     // Override in subclass
 }
