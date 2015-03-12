@@ -100,6 +100,10 @@
                 [self performSelectorInBackground:@selector(performLocalSearch:)
                                        withObject:self.query];
             }
+            if (self.searchMode != CLKSearcherModeRemoteOnly && [self allowEmptyLocalSearch]) {
+                [self performBackgroundSelectorOnSelf:@selector(performLocalSearch:)
+                                           withObject:query];
+            }
             if (self.searchMode != CLKSearcherModeLocalOnly && [self allowEmptyRemoteSearch]) {
                 [self performSelectorInBackground:@selector(performRemoteSearch:)
                                        withObject:self.query];

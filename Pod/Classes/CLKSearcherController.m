@@ -117,7 +117,7 @@
     self.noResultsView.hidden = (!self.isSearching || [self.table numberOfRowsInSection:0] != 0);
 }
 
-- (BOOL)waitingOnNetwork
+- (BOOL)showLoadingCell
 {
     return self.searcher.outstandingRequestCount > 0;
 }
@@ -142,7 +142,7 @@
 
     NSInteger rowCount = self.searcher.results.count;
     // show a loading cell at the bottom
-    if ([self waitingOnNetwork]) {
+    if ([self showLoadingCell]) {
         rowCount += 1;
     }
     return rowCount;
@@ -174,7 +174,7 @@
 - (BOOL)isLoadingCellPath:(NSIndexPath *)indexPath
               ofTableView:(UITableView *)tableView
 {
-    if (![self waitingOnNetwork]) {
+    if (![self showLoadingCell]) {
         return NO;
     }
 
