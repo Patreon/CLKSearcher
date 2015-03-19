@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "CLKSearcher"
-  s.version          = "0.1.0"
+  s.version          = "0.0.1"
   s.summary          = "CLKSearcher is the best way to allow your users to keyword search over remote and local content"
   s.homepage         = "https://github.com/Clinkle/CLKSearcher"
   s.license          = 'MIT'
