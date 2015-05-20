@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name             = "CLKSearcher"
-  s.version          = "0.1.1"
+  s.version          = "1.0.1"
   s.summary          = "CLKSearcher is the best way to allow your users to keyword search over remote and local content"
-  s.homepage         = "https://github.com/Clinkle/CLKSearcher"
-  s.license          = 'MIT'
-  s.author           = { "tsheaff" => "tyler@clinkle.com" }
-  s.source           = { :git => "git://github.com/Clinkle/CLKSearcher.git", :tag => s.version.to_s }
+  s.homepage         = "https://github.com/Patreon/CLKSearcher"
+  s.license          = 'Apache 2.0'
+  s.author           = { "21echoes" => "david@patreon.com" }
+  s.source           = { :git => "git://github.com/Patreon/CLKSearcher.git", :tag => s.version.to_s }
 
   s.dependency 'FrameAccessor', '~> 1.3.2'
 
