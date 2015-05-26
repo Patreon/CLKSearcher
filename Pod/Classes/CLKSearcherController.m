@@ -9,7 +9,6 @@
 
 @property (nonatomic, strong) NSTimer *searchingTimer;
 @property (nonatomic, assign) BOOL hitSearchButton;
-@property (nonatomic, copy) NSString *query;
 
 @end
 

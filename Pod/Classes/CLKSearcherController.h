@@ -31,10 +31,14 @@
 // assign your subclass of CLKSearcher here
 @property (nonatomic, strong) CLKSearcher *searcher;
 
+
 // assign your own views to these three properties
 @property (nonatomic, strong) UITextField *field; // delegate and returnKeyType will be set automatically
 @property (nonatomic, strong) UITableView *table; // delegate and dataSource will be set automatically
 @property (nonatomic, strong) UIView *noResultsView;
+
+// set query to perform a search (or just assign 'field')
+@property (nonatomic, copy) NSString *query;
 
 // hear about user selection of search results
 @property (nonatomic, weak) id<CLKSearcherControllerDelegate> delegate;
