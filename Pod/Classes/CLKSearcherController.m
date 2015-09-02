@@ -377,7 +377,9 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)forceSearchCurrentText
 {
-  self.query = self.field.text;
+  if (self.field) {
+    self.query = self.field.text;
+  }
   // run the side-effects of the setter
   self.query = self.query ? self.query : @"";
 }
